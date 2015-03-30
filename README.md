@@ -11,6 +11,12 @@ uCore OS Labs是用于清华大学计算机系本科操作系统课程的教学�
 5. 每天（一周七日）都有助教或老师在piazza在线答疑。如在[在线OS课程问题集](http://xuyongjiande.gitbooks.io/os-qa/)没找到解答，可到[piazza在线OS课程问答和交流区](https://piazza.com/tsinghua.edu.cn/spring2015/30240243x/home)提问。（QQ群 181873534主要用于本课程和OS相关事件发布，以及各种一般性交流）；
 6. 可进一步在[学堂在线](https://www.xuetangx.com/courses/TsinghuaX/30240243X/2015_T1/about)或[在线的操作系统课程练习题](https://www.gitbook.io/book/xuyongjiande/os_exercises)完成实验相关的练习题；
 
+## 四种学习目标和对应手段
+1. 掌握OS基本概念：看在线课程，能理解OS原理与概念；看在线实验指导书并分析源码，能理解labcodes_answer的labs运行结果
+2. 掌握OS设计实现：在1的基础上，能够通过编程完成labcodes的8个lab实验中的基本练习和实验报告
+3. 掌握OS核心功能：在2的基础上，能够通过编程完成labcodes的8个lab实验中的challenge练习
+4. 掌握OS科学研究：在3的基础上，能够通过阅读论文、设计、编程、实验评价等过程来完成课程设计（大实验）
+
 【**注意**】
   - **筑基内功**--请提前学习计算机原理、C语言、数据结构课程
   - **工欲善其事，必先利其器**--请掌握七种武器  [实验常用工具列表](https://github.com/objectkuan/ucore_docs/blob/master/lab0/lab0_ref_ucore-tools.md)
@@ -41,7 +47,7 @@ uCore OS Labs是用于清华大学计算机系本科操作系统课程的教学�
 
 
 ## 实验环境
-ucore OS实验主要在Linux环境下开发，有如下四种方法。
+ucore OS实验主要在Linux环境下开发，有如下五种方法。
 
 ### 一、[在线实验--基于"实验楼"在线平台](http://www.shiyanlou.com/courses/221)
 特点：不用在本机配置环境或安装虚拟机，你需要的是可以可以上网的网络浏览器，实验都可在网上完成！感谢[实验楼](http://www.shiyanlou.com/)提供的支持！
@@ -91,7 +97,28 @@ C:\Users\VirtualBox VMs\
 建议a: 设置虚拟硬盘的大小为8GB以上，虚拟内存在1B以上。
 建议b: 如果你的机器安装的是32位的windows，则下载32位的ubuntu 14.04 32bit img镜像。
 
-### 四、手动在物理PC中安装环境
+
+### 四、在MAC OS下进行实验
+
+感谢 altkatz！
+
+Using gcc49
+
+#### 1.install [homebrew](http://brew.sh/)
+
+#### 2.install binutils, gcc, gdb targeting i386-elf
+
+* `brew tap altkatz/homebrew-gcc_cross_compilers` 
+* `brew install i386-elf-gcc` # may take an hour
+* `brew install i386-elf-gdb` 
+
+#### 3. install qemu-system-i386
+
+* `brew install qemu`
+
+### 五、手动在物理PC中安装环境
+
+
 -------------------------------------
 特点：性能最好，但安装有一定难度，需要对Linux比较熟悉
 

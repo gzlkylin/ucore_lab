@@ -277,7 +277,7 @@ read_eip(void) {
  * were passed to it, but you aren't sure who passed the bad arguments. A stack
  * backtrace lets you find the offending function.
  *
- * The nline function read_ebp() can tell us the value of current ebp. And the
+ * The inline function read_ebp() can tell us the value of current ebp. And the
  * non-inline function read_eip() is useful, it can read the value of current eip,
  * since while calling this function, read_eip() can read the caller's eip from
  * stack easily.
