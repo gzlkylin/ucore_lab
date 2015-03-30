@@ -8,7 +8,7 @@
 #define SEG_KDATA    2
 #define SEG_UTEXT    3
 #define SEG_UDATA    4
-#define SEG_TSS        5
+#define SEG_TSS      5
 
 /* global descrptor numbers */
 #define GD_KTEXT    ((SEG_KTEXT) << 3)        // kernel text

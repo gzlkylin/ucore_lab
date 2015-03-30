@@ -277,7 +277,7 @@ read_eip(void) {
  * were passed to it, but you aren't sure who passed the bad arguments. A stack
  * backtrace lets you find the offending function.
  *
- * The inline function read_ebp() can tell us the value of current ebp. And the
+ * The nline function read_ebp() can tell us the value of current ebp. And the
  * non-inline function read_eip() is useful, it can read the value of current eip,
  * since while calling this function, read_eip() can read the caller's eip from
  * stack easily.
@@ -302,5 +302,26 @@ print_stackframe(void) {
       *           NOTICE: the calling funciton's return addr eip  = ss:[ebp+4]
       *                   the calling funciton's ebp = ss:[ebp]
       */
+    uint32_t ebp;
+    uint32_t eip;
+    uint32_t cnt = 4; 
+    
+    uint32_t arg;
+    
+    ebp = read_ebp();
+    eip = read_eip();
+    cprintf("ebp:0x%08x eip:0x%08x");
+    
+    asm volatile("movl 8(%%ebp), %0" : "=r" (arg));
+    cprintf(" 0x%#08x", arg); 
+    asm volatile("movl 12(%%ebp), %0" : "=r" (arg));
+    cprintf(" 0x%#08x", arg); 
+    asm volatile("movl 16(%%ebp), %0" : "=r" (arg));
+    cprintf(" 0x%#08x", arg); 
+    asm volatile("movl 20(%%ebp), %0" : "=r" (arg));
+    cprintf(" 0x%#08x", arg); 
+    cprintf("\n");
+    print_debuginfo(eip);
+	
 }
 
