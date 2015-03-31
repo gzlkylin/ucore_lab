@@ -9,7 +9,7 @@
    usually split, and the remainder added to the list as another free block.
    Please see Page 196~198, Section 8.2 of Yan Wei Ming's chinese book "Data Structure -- C programming language"
 */
-// LAB2 EXERCISE 1: YOUR CODE
+// LAB2 EXERCISE 1: xuetang gzlkylin@gmail.com
 // you should rewrite functions: default_init,default_init_memmap,default_alloc_pages, default_free_pages.
 /*
  * Details of FFMA
@@ -149,10 +149,10 @@ default_free_pages(struct Page *base, size_t n) {
 	p = le2page(le, page_link);
 	if (base + base->property == p)//if the after can be combined
 	{
-			le = list_next(le);
-			base->property += p->property;
+		le = list_next(le);
+		base->property += p->property;
            	ClearPageProperty(p);
-			p->property = 0;
+		p->property = 0;
            	list_del(&(p->page_link));
 	}
 	nr_free += n;
@@ -287,4 +287,3 @@ const struct pmm_manager default_pmm_manager = {
     .nr_free_pages = default_nr_free_pages,
     .check = default_check,
 };
-
