@@ -111,7 +111,7 @@ alloc_proc(void) {
 		proc->parent = NULL;
 		proc->mm = NULL;
 		memset(&(proc->context), 0, sizeof(struct context));
-		proc->wait_state == 0;
+		proc->wait_state = 0;
 		proc->flags = 0;
 		proc->tf = NULL;
 		proc->cr3 = boot_cr3;
@@ -403,33 +403,31 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     //    5. insert proc_struct into hash_list && proc_list
     //    6. call wakup_proc to make the new child process RUNNABLE
     //    7. set ret vaule using child proc's pid
-	if ( (proc = alloc_proc()) == NULL)
+	if ((proc = alloc_proc()) == NULL)
 		goto fork_out;
-	if (current->wait_state == 0)	
-		proc->parent = current;
 
-	if ( setup_kstack(proc) != 0)
+	proc->parent = current;
+	assert(current->wait_state == 0);
+
+	if (setup_kstack(proc) != 0)
 		goto bad_fork_cleanup_proc;
-	if ( copy_mm(clone_flags, proc) != 0)
+
+	if (copy_mm(clone_flags, proc) != 0)
 		goto bad_fork_cleanup_kstack;
 
 	copy_thread(proc, stack, tf);
+
 	bool intr_flag;
 	local_intr_save(intr_flag); //close intr
 	{
-
 		proc->pid = get_pid();	
 		hash_proc(proc);
-		if (proc->parent != NULL)
-			set_links(proc);
-		else
-		{
-			list_add(&proc_list, &(proc->list_link));
-			nr_process ++;
-		}
+		set_links(proc);
 	}
 	local_intr_restore(intr_flag);
+
 	wakeup_proc(proc);
+
 	ret = proc->pid;
 	//LAB5 xuetang gzlkylin@gmail.com: (update LAB4 steps)
    /* Some Functions
@@ -441,6 +439,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
 
 fork_out:
     return ret;
+
 bad_fork_cleanup_kstack:
     put_kstack(proc);
 bad_fork_cleanup_proc:
@@ -640,7 +639,7 @@ load_icode(unsigned char *binary, size_t size) {
 	tf->tf_ds = tf->tf_es = tf->tf_ss = USER_DS;
 	tf->tf_esp = USTACKTOP;
 	tf->tf_eip = elf->e_entry;
-	tf->tf_eflags |= FL_IF;
+	tf->tf_eflags = FL_IF;
 	ret = 0;
 out:
     return ret;
@@ -817,7 +816,7 @@ user_main(void *arg) {
 #ifdef TEST
     KERNEL_EXECVE2(TEST, TESTSTART, TESTSIZE);
 #else
-    KERNEL_EXECVE(exit);
+    KERNEL_EXECVE(spin);
 #endif
     panic("user_main execve failed.\n");
 }

@@ -444,7 +444,6 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
     }
 }
 
-
 void
 unmap_range(pde_t *pgdir, uintptr_t start, uintptr_t end) {
     assert(start % PGSIZE == 0 && end % PGSIZE == 0);
@@ -524,8 +523,9 @@ copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
          * (3) memory copy from src_kvaddr to dst_kvaddr, size is PGSIZE
          * (4) build the map of phy addr of  npage with the linear addr start
          */
-		memcpy(page2kva(page), page2kva(npage), PGSIZE);
-		ret = page_insert(nptep, npage, start, perm);	
+
+		memcpy(page2kva(npage), page2kva(page), PGSIZE);
+		ret = page_insert(to, npage, start, perm);
         assert(ret == 0);
         }
         start += PGSIZE;
