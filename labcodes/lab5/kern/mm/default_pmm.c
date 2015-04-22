@@ -73,6 +73,7 @@ default_init_memmap(struct Page *base, size_t n) {
         assert(PageReserved(p));
         p->flags = p->property = 0;
         set_page_ref(p, 0);
+		p->page_link.next = p->page_link.prev = &p->page_link;
     }
     base->property = n;
     SetPageProperty(base);
@@ -95,16 +96,18 @@ default_alloc_pages(size_t n) {
             break;
         }
     }
+	le = list_next(le);
     if (page != NULL) {
         list_del(&(page->page_link));
         if (page->property > n) {
             struct Page *p = page + n;
             p->property = page->property - n;
-            list_add(&free_list, &(p->page_link));
-    }
+            list_add_before(le, &(p->page_link));
+    	}
         nr_free -= n;
         ClearPageProperty(page);
     }
+
     return page;
 }
 
@@ -119,24 +122,38 @@ default_free_pages(struct Page *base, size_t n) {
     }
     base->property = n;
     SetPageProperty(base);
-    list_entry_t *le = list_next(&free_list);
-    while (le != &free_list) {
-        p = le2page(le, page_link);
-        le = list_next(le);
-        if (base + base->property == p) {
-            base->property += p->property;
-            ClearPageProperty(p);
-            list_del(&(p->page_link));
-        }
-        else if (p + p->property == base) {
-            p->property += base->property;
-            ClearPageProperty(base);
-            base = p;
-            list_del(&(p->page_link));
-        }
-    }
-    nr_free += n;
-    list_add(&free_list, &(base->page_link));
+    list_entry_t *le = &free_list;
+
+   	le = list_next(&free_list); 
+    p = le2page(le, page_link);
+
+	while ((p - base < 0) && (le != &free_list)) {//find the correct address
+		le = list_next(le);
+		p = le2page(le, page_link);
+	}
+	
+	le = list_prev(le);
+	p = le2page(le, page_link);
+	le = list_next(le);
+	if(p + p->property == base)//if the former can be combined
+	{
+		p->property += base->property;
+		base->property = 0;
+		ClearPageProperty(base);
+		base = p;
+		list_del(&(p->page_link));
+	}
+	p = le2page(le, page_link);
+	if (base + base->property == p)//if the after can be combined
+	{
+		le = list_next(le);
+		base->property += p->property;
+           	ClearPageProperty(p);
+		p->property = 0;
+           	list_del(&(p->page_link));
+	}
+	nr_free += n;
+	list_add_before(le, &(base->page_link));
 }
 
 static size_t
