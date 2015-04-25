@@ -35,6 +35,7 @@ static void print_ticks() {
  * */
 static struct gatedesc idt[256] = {{0}};
 
+extern uintptr_t __vectors[];
 static struct pseudodesc idt_pd = {
     sizeof(idt) - 1, (uintptr_t)idt
 };
@@ -54,9 +55,23 @@ idt_init(void) {
       *     You don't know the meaning of this instruction? just google it! and check the libs/x86.h to know more.
       *     Notice: the argument of lidt is idt_pd. try to find it!
       */
-     /* LAB5 YOUR CODE */ 
-     //you should update your lab1 code (just add ONE or TWO lines of code), let user app to use syscall to get the service of ucore
-     //so you should setup the syscall interrupt gate in here
+    extern uintptr_t __vectors[];
+    
+	//best code
+    uint32_t ind;
+    for (ind = 0; ind <= 255; ind++){
+    	if (ind == T_SYSCALL){
+	    SETGATE(idt[ind], 1, GD_KTEXT, __vectors[ind], DPL_USER);	
+	}
+	else if (ind < IRQ_OFFSET){
+	    SETGATE(idt[ind], 1, GD_KTEXT, __vectors[ind], DPL_KERNEL);	
+	}
+	else {
+	    SETGATE(idt[ind], 0, GD_KTEXT, __vectors[ind], DPL_KERNEL);	
+	}
+    }
+
+    lidt(&idt_pd);
 }
 
 static const char *
@@ -224,6 +239,12 @@ trap_dispatch(struct trapframe *tf) {
         /* you should upate you lab1 code (just add ONE or TWO lines of code):
          *    Every TICK_NUM cycle, you should set current process's current->need_resched = 1
          */
+		ticks ++;
+		if (ticks % TICK_NUM == 0)
+		{
+			assert(current != NULL);
+			current->need_resched = 1;
+		}
         /* LAB6 YOUR CODE */
         /* IMPORTANT FUNCTIONS:
 	     * run_timer_list
