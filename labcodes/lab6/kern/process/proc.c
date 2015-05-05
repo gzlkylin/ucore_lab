@@ -103,20 +103,26 @@ alloc_proc(void) {
      *       uint32_t flags;                             // Process flag
      *       char name[PROC_NAME_LEN + 1];               // Process name
      */
-		proc->state = PROC_UNINIT;
-		proc->pid = -1;
-		proc->runs = 0;
-		proc->kstack = 0;
-		proc->need_resched = 0;
-		proc->parent = NULL;
-		proc->mm = NULL;
-		memset(&(proc->context), 0, sizeof(struct context));
-		proc->wait_state = 0;
-		proc->flags = 0;
-		proc->tf = NULL;
-		proc->cr3 = boot_cr3;
-		memset(proc->name, 0, PROC_NAME_LEN);
-		proc->optr = proc->cptr = proc->yptr = NULL;
+        proc->state = PROC_UNINIT;
+        proc->pid = -1;
+        proc->runs = 0;
+        proc->kstack = 0;
+        proc->need_resched = 0;
+        proc->parent = NULL;
+        proc->mm = NULL;
+        memset(&(proc->context), 0, sizeof(struct context));
+        proc->tf = NULL;
+        proc->cr3 = boot_cr3;
+        proc->flags = 0;
+        memset(proc->name, 0, PROC_NAME_LEN);
+        proc->wait_state = 0;
+        proc->cptr = proc->optr = proc->yptr = NULL;
+        proc->rq = NULL;
+        proc->run_link.prev = proc->run_link.next = NULL;
+        proc->time_slice = 0;
+        proc->lab6_run_pool.left = proc->lab6_run_pool.right = proc->lab6_run_pool.parent = NULL;
+        proc->lab6_stride = 0;
+        proc->lab6_priority = 0;
     }
     return proc;
 }
@@ -815,7 +821,7 @@ user_main(void *arg) {
 #ifdef TEST
     KERNEL_EXECVE2(TEST, TESTSTART, TESTSIZE);
 #else
-    KERNEL_EXECVE(exit);
+    KERNEL_EXECVE(forktree);
 #endif
     panic("user_main execve failed.\n");
 }
